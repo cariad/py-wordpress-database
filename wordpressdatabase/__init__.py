@@ -37,7 +37,7 @@ def ensure(engine,
 
     cursor = conn.cursor()
     # Note that the parameter below needs to be a tuple, not a string.
-    response = cursor.execute('CREATE DATABASE IF NOT EXISTS %s;', (db_name, ))
+    response = cursor.execute('CREATE DATABASE IF NOT EXISTS %s', (db_name, ))
 
     cursor.close()
     conn.close()
