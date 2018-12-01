@@ -93,6 +93,6 @@ def ensure(wp_config_filename,
     database.ensure_database_setup(admin_credentials=admin_credentials)
 
     LOG.info('Validating the database setup...')
-    if database.test_config():
+    if database.test_config(throw=True):
         LOG.info('Successfully connected.')
         return

@@ -56,7 +56,7 @@ class Database():
             user=username,
             passwd=password)
 
-    def test_config(self):
+    def test_config(self, throw=False):
         """
         Tests the connection details in the WordPress configuration.
 
@@ -71,7 +71,9 @@ class Database():
             conn.close()
             return True
 
-        except connector.errors.ProgrammingError:
+        except connector.errors.ProgrammingError as error:
+            if throw:
+                raise error
             return False
 
     def ensure_database_setup(self, admin_credentials):
