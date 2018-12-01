@@ -36,7 +36,7 @@ def ensure(engine,
         passwd=admin_credentials.password)
 
     cursor = conn.cursor()
-    response = cursor.execute('CREATE DATABASE IF NOT EXISTS %s;', (db_name))
+    response = cursor.execute('CREATE DATABASE IF NOT EXISTS %s', (db_name))
 
     cursor.close()
     conn.close()
