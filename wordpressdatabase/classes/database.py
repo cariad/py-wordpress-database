@@ -49,12 +49,12 @@ class Database():
                 host=host,
                 port=port,
                 user=username,
-                passwd=password)
+                password=password)
 
         return connector.connect(
             host=host,
             user=username,
-            passwd=password)
+            password=password)
 
     def test_config(self, throw=False):
         """
