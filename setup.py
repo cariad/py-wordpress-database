@@ -13,7 +13,8 @@ setup(
     author_email='cariad@cariad.me',
     license='MIT',
     packages=[
-        'wordpressdatabase'
+        'wordpressdatabase',
+        'wordpressdatabase.exceptions'
     ],
     install_requires=[
         'boto3~=1.9.0',
