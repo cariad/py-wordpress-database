@@ -3,95 +3,96 @@
 """
 
 import json
-import logging
+from logging import getLogger
 
 import boto3
 
 from mysql import connector
+from wpconfigr import WpConfigFile
 
-from wordpressdatabase.classes import Credentials
-from wordpressdatabase.exceptions import UnhandledEngineError
-
-
-def is_valid_database_name(name):
-    logger = logging.getLogger(__name__)
-
-    for c in name:
-        if (not str.isalnum(c)) and (c != '_'):
-            logger.error('%s is not a valid character in a database name.', c)
-            return False
-
-    logger.info('%s is a valid database name.', name)
-    return True
+from wordpressdatabase.classes import Database
+from wordpressdatabase.exceptions import InvalidDatabaseNameError
 
 
-def connect(host, username, password, port=None):
+LOG = getLogger(__name__)
+
+
+def update_wp_config(wp_config, host, db_name, user_credentials, port=None):
+    """
+    Update the WordPress configuration to match the requested values.
+
+    Args:
+        wp_config (WpConfigFile): Configuration.
+        host (str): Database hostname.
+        db_name (str): Database name.
+        user_credentials (Credentials): WordPress database user credentials.
+        port (str, optional): Database port.
+
+    Raises:
+        Exception: [description]
+    """
+
+    LOG.info('Updating WordPress configuration...')
+
+    for char in db_name:
+        if str.isalnum(char) or char == '_':
+            continue
+
+        LOG.error('"%s" is not valid in a database name.', char)
+        raise InvalidDatabaseNameError(db_name)
 
     if port:
-        return connector.connect(
-            host=host,
-            port=port,
-            user=username,
-            passwd=password)
+        host_and_port = host + ':' + port
+    else:
+        host_and_port = host
 
-    return connector.connect(
-        host=host,
-        user=username,
-        passwd=password)
+    wp_config.set('DB_HOST', host_and_port)
+    wp_config.set('DB_USER', user_credentials.username)
+    wp_config.set('DB_PASSWORD', user_credentials.password)
+    wp_config.set('DB_NAME', db_name)
 
 
-def ensure(engine,
+def ensure(wp_config_filename,
+           admin_credentials,
+           user_credentials,
            host,
-           wp_username,
-           wp_password,
-           admin_username=None,
-           admin_password=None,
-           admin_credentials_secret_id=None,
-           db_name='wordpress',
-           port=None,
-           region=None):
+           db_name,
+           port=None):
+    """
+    Ensures that the WordPress configuration matches the specified values and
+    that the database is set up.
 
-    if engine != 'mysql':
-        raise UnhandledEngineError()
+    Args:
+        wp_config_filename (str):        Path and filename of "wp-config.php".
+        admin_credentials (Credentials): Database admin user credentials.
+        user_credentials (Credentials):  WordPress database user credentials.
+        host (str):                      Database host.
+        db_name (str):                   Database name.
+        port (int, optional):            Database port.
 
-    admin_credentials = Credentials(username=admin_username,
-                                    password=admin_password,
-                                    secret_id=admin_credentials_secret_id,
-                                    region=region)
+    Raises:
+        InvalidDatabaseNameError: The database name is invalid.
+    """
 
-    if not is_valid_database_name(db_name):
-        raise Exception('Invalid database name.')
+    wp_config = WpConfigFile(filename=wp_config_filename)
 
-    logger = logging.getLogger(__name__)
-    logger.info('Connecting to %s...', host)
+    update_wp_config(wp_config=wp_config,
+                     host=host,
+                     port=port,
+                     db_name=db_name,
+                     user_credentials=user_credentials)
 
-    conn = connect(host=host,
-                   port=port,
-                   username=admin_credentials.username,
-                   password=admin_credentials.password)
+    database = Database(wp_config=wp_config)
 
-    cursor = conn.cursor()
+    LOG.info('Checking if the specified database has already been set up...')
+    if database.test_config():
+        LOG.info('Successfully connected.')
+        return
 
-    logger.info('Ensuring database "%s" exists...', db_name)
+    LOG.info('Could not connect, so will set up the database.')
+    database.ensure_database_setup(admin_credentials=admin_credentials)
 
-    # Database names cannot be parameterized, so validate it and be careful.
-    cursor.execute('CREATE DATABASE IF NOT EXISTS {};'.format(db_name))
-
-    logger.info('Using database "%s"...', db_name)
-    cursor.execute('USE {};'.format(db_name))
-
-    logger.info('Ensuring user "%s" exists...', wp_username)
-    cursor.execute('GRANT ALL PRIVILEGES ON {} TO %s IDENTIFIED BY %s;'.format(db_name),
-                   (wp_username, wp_password))
-
-    logger.info('Flushing privileges...')
-    cursor.execute('FLUSH PRIVILEGES;')
-
-    logger.info('Committing transaction...')
-    conn.commit()
-
-    logger.info('Closing connection...')
-    cursor.close()
-    conn.close()
-
-    logger.info('Done.')
+    LOG.info('Validating the database setup...')
+    if database.test_config():
+        LOG.info('Successfully connected.')
+        return

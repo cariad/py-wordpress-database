@@ -19,7 +19,8 @@ setup(
     ],
     install_requires=[
         'boto3~=1.9.0',
-        'mysql-connector~=2.1.0'
+        'mysql-connector~=2.1.0',
+        'wpconfigr~=1.0.0'
     ],
     extras_require={
         'dev': [
