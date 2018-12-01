@@ -14,9 +14,14 @@ from wordpressdatabase.exceptions import UnhandledEngineError
 
 
 def is_valid_database_name(name):
+    logger = logging.getLogger(__name__)
+
     for c in name:
         if not str.isalnum(c) or c != '_':
+            logger.error('%s is not a valid character in a database name.', c)
             return False
+
+    logger.info('%s is a valid database name.', name)
     return True
 
 
@@ -43,7 +48,6 @@ def ensure(engine,
         raise Exception('Invalid database name.')
 
     logger = logging.getLogger(__name__)
-
     logger.info('Connecting to %s...', host)
 
     conn = connect(
