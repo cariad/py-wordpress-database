@@ -69,7 +69,7 @@ class Database():
         try:
             conn = self._connect(host_and_port=self._wp_config.get('DB_HOST'),
                                  username=self._wp_config.get('DB_USER'),
-                                 password=self._wp_config.get('DB_PORT'))
+                                 password=self._wp_config.get('DB_PASSWORD'))
             conn.close()
             return True
 
