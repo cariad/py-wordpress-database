@@ -26,6 +26,9 @@ def run_from_cli():
     arg_parser.add_argument('--wp-username',
                             required=True)
 
+    arg_parser.add_argument('--wp-password',
+                            required=True)
+
     arg_parser.add_argument('--region',
                             required=False)
 
@@ -36,6 +39,7 @@ def run_from_cli():
         engine='mysql',
         admin_credentials_secret_id=args.admin_secret,
         wp_username=args.wp_username,
+        wp_password=args.wp_password,
         db_name=args.db_name,
         region=args.region)
 
