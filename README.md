@@ -11,3 +11,8 @@ To install development dependencies:
 ```shell
 pip install -e .[dev]
 ```
+
+To run:
+```shell
+python -m wordpressdatabase
+```
