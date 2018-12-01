@@ -13,8 +13,17 @@ from wordpressdatabase.classes import Credentials
 from wordpressdatabase.exceptions import UnhandledEngineError
 
 
+def is_valid_database_name(name):
+    for c in name:
+        if not str.isalnum(c) or c != '_':
+            return False
+    return True
+
+
 def ensure(engine,
            host,
+           wp_username,
+           wp_password,
            admin_username=None,
            admin_password=None,
            admin_credentials_secret_id=None,
@@ -30,34 +39,38 @@ def ensure(engine,
                                     secret_id=admin_credentials_secret_id,
                                     region=region)
 
+    if not is_valid_database_name(db_name):
+        raise Exception('Invalid database name.')
+
+    logger = logging.getLogger(__name__)
+
+    logger.info('Connecting to %s...', host)
+
     conn = connect(
         host=host,
+        port=port,
         user=admin_credentials.username,
         passwd=admin_credentials.password)
 
     cursor = conn.cursor()
-    # Note that the parameter below needs to be a tuple, not a string.
 
-    try:
-        response = cursor.execute('CREATE DATABASE IF NOT EXISTS %s;', (db_name, ))
-    except Exception as e:
-        print(cursor.statement)
-        raise e
+    logger.info('Ensuring database "%s" exists...', db_name)
 
+    # Database names cannot be parameterized, so validate it and be careful.
+    cursor.execute('CREATE DATABASE IF NOT EXISTS {};'.format(db_name))
+
+    logger.info('Ensuring user "%s" exists...', wp_username)
+    cursor.execute('GRANT ALL PRIVILEGES ON {} TO %s IDENTIFIED BY %s;'.format(db_name),
+                   (wp_username, wp_password))
+
+    logger.info('Flushing privileges...')
+    cursor.execute('FLUSH PRIVILEGES;')
+
+    logger.info('Committing transaction...')
     conn.commit()
 
+    logger.info('Closing connection...')
     cursor.close()
     conn.close()
 
-    print(str(response))
-
-
-# def _get_credentials(secret_id,
-#                      username_key='username',
-#                      password_key='password'):
-
-#     client = boto3.client('secretsmanager')
-#     response = client.get_secret_value(SecretId=secret_id)
-#     secret_string = response['SecretString']
-#     secret = json.loads(secret_string)
-#     return secret[username_key], secret[password_key]
+    logger.info('Done.')

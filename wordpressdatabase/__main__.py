@@ -20,6 +20,12 @@ def run_from_cli():
     arg_parser.add_argument('--admin-secret',
                             required=True)
 
+    arg_parser.add_argument('--db-name',
+                            required=True)
+
+    arg_parser.add_argument('--wp-username',
+                            required=True)
+
     arg_parser.add_argument('--region',
                             required=False)
 
@@ -29,6 +35,8 @@ def run_from_cli():
         host=args.host,
         engine='mysql',
         admin_credentials_secret_id=args.admin_secret,
+        wp_username=args.wp_username,
+        db_name=args.db_name,
         region=args.region)
 
 
