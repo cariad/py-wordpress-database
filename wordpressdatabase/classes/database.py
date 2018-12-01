@@ -64,11 +64,15 @@ class Database():
             bool: Success.
         """
 
-        conn = self._connect(host_and_port=self._wp_config.get('DB_HOST'),
-                             username=self._wp_config.get('DB_USER'),
-                             password=self._wp_config.get('DB_PORT'))
-        conn.close()
-        return True
+        try:
+            conn = self._connect(host_and_port=self._wp_config.get('DB_HOST'),
+                                 username=self._wp_config.get('DB_USER'),
+                                 password=self._wp_config.get('DB_PORT'))
+            conn.close()
+            return True
+
+        except connector.errors.ProgrammingError:
+            return False
 
     def ensure_database_setup(self, admin_credentials):
         """
