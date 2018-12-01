@@ -17,7 +17,7 @@ def is_valid_database_name(name):
     logger = logging.getLogger(__name__)
 
     for c in name:
-        if not str.isalnum(c) or c != '_':
+        if not str.isalpha(c) or c != '_':
             logger.error('%s is not a valid character in a database name.', c)
             return False
 
