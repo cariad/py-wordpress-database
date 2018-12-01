@@ -44,6 +44,8 @@ class Database():
                        host,
                        port)
 
+        self._log.info('Password = "%s"', password)
+
         if port:
             return connector.connect(
                 host=host,
