@@ -46,14 +46,12 @@ class Database():
 
         if port:
             return connector.connect(
-                engine='InnoDB',
                 host=host,
                 port=port,
                 user=username,
                 password=password)
 
         return connector.connect(
-            engine='InnoDB',
             host=host,
             user=username,
             password=password)
