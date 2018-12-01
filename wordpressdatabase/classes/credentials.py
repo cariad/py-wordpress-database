@@ -23,6 +23,9 @@ class Credentials():
         self._username = username
         self._password = password
 
+        print(self._username)
+        print(self._password)
+
         if secret_id:
             self._secret = Secret(identifier=secret_id, region=region)
         else:
