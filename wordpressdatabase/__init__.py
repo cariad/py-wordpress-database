@@ -7,7 +7,7 @@ import logging
 
 import boto3
 
-from mysql.connector import connect
+from mysql import connector
 
 from wordpressdatabase.classes import Credentials
 from wordpressdatabase.exceptions import UnhandledEngineError
@@ -23,6 +23,21 @@ def is_valid_database_name(name):
 
     logger.info('%s is a valid database name.', name)
     return True
+
+
+def connect(host, username, password, port=None):
+
+    if port:
+        return connector.connect(
+            host=host,
+            port=port,
+            user=username,
+            passwd=password)
+
+    return connector.connect(
+        host=host,
+        user=username,
+        passwd=password)
 
 
 def ensure(engine,
@@ -50,11 +65,10 @@ def ensure(engine,
     logger = logging.getLogger(__name__)
     logger.info('Connecting to %s...', host)
 
-    conn = connect(
-        host=host,
-        port=port,
-        user=admin_credentials.username,
-        passwd=admin_credentials.password)
+    conn = connect(host=host,
+                   port=port,
+                   username=admin_credentials.username,
+                   password=admin_credentials.password)
 
     cursor = conn.cursor()
 
