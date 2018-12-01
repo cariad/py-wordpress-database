@@ -14,6 +14,7 @@ setup(
     license='MIT',
     packages=[
         'wordpressdatabase',
+        'wordpressdatabase.classes',
         'wordpressdatabase.exceptions'
     ],
     install_requires=[
