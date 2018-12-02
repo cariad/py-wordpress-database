@@ -79,12 +79,13 @@ class Database():
             admin_credentials (Credentials): Database admin credentials.
         """
 
-        # def sql(statement):
-        #     return statement.format(n=db_name)
-
         def cur_exec(statement, params=None):
             sql = statement.format(n=db_name)
-            cur.execute(sql, params)
+            try:
+                cur.execute(sql, params)
+            except connector.errors.ProgrammingError as error:
+                self._log.error('Failed to execute: %s', cur.statement)
+                raise error
 
         host_and_port = self._wp_config.get('DB_HOST')
         db_name = self._wp_config.get('DB_NAME')
