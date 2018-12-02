@@ -102,7 +102,7 @@ class Database():
         cur.execute(sql('USE {n};'))
 
         self._log.info('Ensuring user "%s" exists...', wp_username)
-        cur.execute(sql('GRANT ALL PRIVILEGES ON {n} TO %s IDENTIFIED BY %s;'),
+        cur.execute(sql('GRANT ALL PRIVILEGES ON {n}.* TO %s IDENTIFIED BY %s;'),
                     (wp_username, wp_password))
 
         self._log.info('Flushing privileges...')
