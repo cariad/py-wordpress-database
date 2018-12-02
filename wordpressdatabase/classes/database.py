@@ -6,15 +6,14 @@ from mysql import connector
 
 
 class Database():
+    """
+    Database.
+
+    Args:
+        wp_config (wpconfigr.WpConfigFile): WordPress configuration.
+    """
 
     def __init__(self, wp_config):
-        """
-        Database.
-
-        Args:
-            wp_config (wpconfigr.WpConfigFile): WordPress configuration.
-        """
-
         self._wp_config = wp_config
         self._log = getLogger(__name__)
 
@@ -80,8 +79,12 @@ class Database():
             admin_credentials (Credentials): Database admin credentials.
         """
 
-        def sql(statement):
-            return statement.format(n=db_name)
+        # def sql(statement):
+        #     return statement.format(n=db_name)
+
+        def cur_exec(statement, params=None):
+            sql = statement.format(n=db_name)
+            cur.execute(sql, params)
 
         host_and_port = self._wp_config.get('DB_HOST')
         db_name = self._wp_config.get('DB_NAME')
@@ -96,17 +99,17 @@ class Database():
 
         self._log.info('Ensuring database "%s" exists...', db_name)
         # Database names cannot be parameterized, so be careful.
-        cur.execute(sql('CREATE DATABASE IF NOT EXISTS {n};'))
+        cur_exec('CREATE DATABASE IF NOT EXISTS {n};')
 
         self._log.info('Using database "%s"...', db_name)
-        cur.execute(sql('USE {n};'))
+        cur_exec('USE {n};')
 
         self._log.info('Ensuring user "%s" exists...', wp_username)
-        cur.execute(sql('GRANT ALL PRIVILEGES ON {n}.* TO %s IDENTIFIED BY %s;'),
-                    (wp_username, wp_password))
+        cur_exec('GRANT ALL PRIVILEGES ON {n}.* TO %s.% IDENTIFIED BY %s;',
+                 (wp_username, wp_password))
 
         self._log.info('Flushing privileges...')
-        cur.execute('FLUSH PRIVILEGES;')
+        cur_exec('FLUSH PRIVILEGES;')
 
         self._log.info('Committing transaction...')
         conn.commit()
