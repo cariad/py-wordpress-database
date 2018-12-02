@@ -40,23 +40,17 @@ class Database():
         else:
             port = None
 
-        self._log.info('Attempting to connect to "%s" on port "%s"...',
-                       host,
-                       port)
-
-        self._log.info('Password = "%s"', password)
+        self._log.info('Attempting to connect...')
 
         if port:
-            return connector.connect(
-                host=host,
-                port=port,
-                user=username,
-                password=password)
+            return connector.connect(host=host,
+                                     port=port,
+                                     user=username,
+                                     password=password)
 
-        return connector.connect(
-            host=host,
-            user=username,
-            password=password)
+        return connector.connect(host=host,
+                                 user=username,
+                                 password=password)
 
     def test_config(self, throw=False):
         """
