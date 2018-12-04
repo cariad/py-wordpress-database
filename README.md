@@ -1,5 +1,7 @@
 # py-wordpress-database
 
+[![CircleCI](https://circleci.com/gh/cariad/py-wordpress-database/tree/master.svg?style=svg)](https://circleci.com/gh/cariad/py-wordpress-database/tree/master)
+
 A Python package that sets up a WordPress database.
 
 ## Usage
