@@ -1,6 +1,6 @@
 # py-wordpress-database
 
-A Python package for creating and interacting with WordPress databases.
+A Python package that sets up a WordPress database.
 
 ## Usage
 
@@ -14,5 +14,5 @@ pip install -e .[dev]
 
 To run:
 ```shell
-python -m wordpressdatabase
+python -m wpdatabase
 ```

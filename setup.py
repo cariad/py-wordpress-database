@@ -20,7 +20,7 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP :: Site Management'
     ],
-    description='A Python package to initialize a WordPress database.',
+    description='A Python package that sets up a WordPress database.',
     extras_require={
         'dev': [
             'autopep8',
