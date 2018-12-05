@@ -39,6 +39,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=[
         'wpdatabase',
+        'wpdatabase.classes',
         'wpdatabase.exceptions'
     ],
     url='https://github.com/cariad/py-wordpress-database',
