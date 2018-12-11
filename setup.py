@@ -29,9 +29,9 @@ setup(
         ]
     },
     install_requires=[
-        'boto3~=1.9.0',
-        'mysql-connector~=2.1.0',
-        'wpconfigr~=1.0.0'
+        'boto3~=1.9',
+        'mysql-connector~=2.1',
+        'wpconfigr~=1.0'
     ],
     name='wpdatabase',
     license='MIT',
@@ -43,4 +43,4 @@ setup(
         'wpdatabase.exceptions'
     ],
     url='https://github.com/cariad/py-wordpress-database',
-    version='1.0')
+    version='1.0.1')
